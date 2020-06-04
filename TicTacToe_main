@@ -1,0 +1,124 @@
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Main {
+    static Scanner sc = new Scanner(System.in);
+    public static void main(String[] args) {
+
+        char[][] ticTac = new char[3][3];
+        for (char[] row : ticTac) {
+            Arrays.fill(row, ' ');
+        }
+
+        Field game = new Field();
+        game.printField(ticTac);
+         do {
+            if (Field.stepCounter % 2 == 0) {
+                game.setCoords(ticTac, 'O');
+            } else {
+                game.setCoords(ticTac, 'X');
+            }
+        } while(Field.gameFinished);
+    }
+}
+
+class Field {
+    static boolean gameFinished = true;
+    static  int stepCounter = 1;
+
+    // Printing game field
+    void printField(char[][] field) {
+        System.out.println("---------");
+        for (int x = 0; x < 3; x++) {
+            System.out.print("| ");
+            for (int y = 0; y < 3; y++) {
+                System.out.print(field[x][y] + " ");
+            }
+            System.out.println("|");
+        }
+        System.out.println("---------");
+    }
+
+    // Getting coordinates and testing conditions
+    void setCoords(char[][] field, char ch) {
+        boolean success = false;
+        while (!success) {
+            System.out.print("Enter the coordinates: ");
+            try {
+                int x = Main.sc.nextInt();
+                int y = Main.sc.nextInt();
+                if (x < 1 || x > 3 || y < 1 || y > 3) {
+                    System.out.println("Coordinates should be from 1 to 3!");
+
+                } else if (x >= 1 && x <= 3 && y >= 1 && y <= 3) {
+                    int realX = 3 - y;
+                    int realY = Math.abs(1 - x);
+                    if (field[realX][realY] == ' ') {
+                        field = setField(field, realX, realY, ch);
+
+                        stepCounter++;
+                        success = true;
+                    } else {
+                        System.out.println("This cell is occupied! Choose another one!");
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("You should enter numbers!");
+                String catchError = Main.sc.nextLine();
+            }
+        }
+    }
+
+    // Assign 'X' (with coordinates) to array
+    char[][] setField(char[][] ticTac, int xC, int yC, char ch) {
+        ticTac[xC][yC] = ch;
+
+        // Game condition check
+        if (xCheck(ticTac) && !oCheck(ticTac)) {
+            printField(ticTac);
+            gameFinished = false;
+            System.out.println("X wins");
+            return null;
+        } else if (oCheck(ticTac) && !xCheck(ticTac)) {
+            printField(ticTac);
+            gameFinished = false;
+            System.out.println("O wins");
+            return null;
+        } else if (!xCheck(ticTac) && !oCheck(ticTac) && stepCounter == 9 /*&& !gameFinished*/) {
+            printField(ticTac);
+            gameFinished = false;
+            System.out.println("Draw");
+            return null;
+        }
+        printField(ticTac);
+        return ticTac;
+    }
+
+    // Winning condition check
+    static boolean xCheck(char[][] tic) {
+        for (int i = 0; i < 3; i++) {
+            if (tic[i][0] == 'X' && tic[i][1] == 'X' && tic[i][2] == 'X') {
+                return true;
+            } else if ((tic[0][i] == 'X' && tic[1][i] == 'X' && tic[2][i] == 'X')) {
+                return true;
+            }
+        }
+        if (tic[0][0] == 'X' && tic[1][1] == 'X' && tic[2][2] == 'X') {
+            return true;
+        } else return tic[0][2] == 'X' && tic[1][1] == 'X' && tic[2][0] == 'X';
+    }
+
+    static boolean oCheck(char[][] tic) {
+        for (int i = 0; i < 3; i++) {
+            if (tic[i][0] == 'O' && tic[i][1] == 'O' && tic[i][2] == 'O') {
+                return true;
+            } else if ((tic[0][i] == 'O' && tic[1][i] == 'O' && tic[2][i] == 'O')) {
+                return true;
+            }
+        }
+        if (tic[0][0] == 'O' && tic[1][1] == 'O' && tic[2][2] == 'O') {
+            return true;
+        } else return (tic[0][2] == 'O' && tic[1][1] == 'O' && tic[2][0] == 'O');
+    }
+}
+
